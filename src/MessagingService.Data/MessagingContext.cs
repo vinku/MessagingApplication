@@ -5,15 +5,19 @@ namespace MessagingService.Data
 {
 	public class MessaginContext : DbContext
 	{
+		public MessaginContext(DbContextOptions<MessaginContext> options)
+			: base(options)
+		{
+
+		}
+
 		public DbSet<User> Users { get; set; }
 		public DbSet<Chat> Chats { get; set; }
 		public DbSet<Message> Messages { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseSqlServer(
-				"Server = (localdb)\\mssqllocaldb; Database = MessagingData; Trusted_Connection = True; "
-				);
+			base.OnConfiguring(optionsBuilder);
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
