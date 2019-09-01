@@ -7,12 +7,6 @@
   <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\..\..\bin\Debug\MyMessagingService.WebAPI\</OutputPath>
-    <BaseIntermediateOutputPath>..\..\..\obj\Debug\MyMessagingService.WebAPI\</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>..\..\..\obj\Debug\MyMessagingService.WebAPI\</IntermediateOutputPath>
-  </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
