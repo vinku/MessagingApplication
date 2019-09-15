@@ -38,22 +38,23 @@ namespace MessagingWebAPI.Controllers
 
 		// POST api/users
 		[HttpPost]
-		public ActionResult Post([FromBody] User user)
+		public ActionResult Post([FromBody] CreateUserDTO userDTO)
 		{
-			if(user == null)
+			if(userDTO == null)
 			{
-				return BadRequest("Can not deserialize the body.");
+				ModelState.AddModelError("Description", "Can not deserialize the body.");
 			}
 
+			User user = userDTO.GetUserFromDTO();
 			if (_repo.UseridExists(user.UserCellId))
 			{
-				return Conflict("User with same cell number already exists, can't add it any more");
+				ModelState.AddModelError("Description", "User with same cell number already exists, can't add it any more.");
 			}
 
-			// NOTE: there has to be a way to validate a phone number (OTP verification). For our case, we assume the cell number has to be a 10 digit string.
-			if (user.UserCellId.Length != 10)
+
+			if (!ModelState.IsValid)
 			{
-				return BadRequest("Phone number must be a 10-digit number");
+				return BadRequest(ModelState);
 			}
 
 			// the creation time is the last seen time for now.
