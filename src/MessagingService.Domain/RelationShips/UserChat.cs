@@ -10,4 +10,3 @@ namespace MessagingService.Domain
 		public Chat Chat { get; set; }
 	}
 }
- 
