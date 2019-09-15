@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MessagingService.Data;
 using MessagingService.Domain;
+using MessagingService.WebAPI.DTO;
 using Microsoft.AspNetCore.Rewrite.Internal.UrlActions;
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
 
@@ -39,12 +40,17 @@ namespace MessagingWebAPI.Controllers
 		[HttpPost]
 		public ActionResult Post([FromBody] User user)
 		{
+			if(user == null)
+			{
+				return BadRequest("Can not deserialize the body.");
+			}
+
 			if (_repo.UseridExists(user.UserCellId))
 			{
 				return Conflict("User with same cell number already exists, can't add it any more");
 			}
 
-			// NOTE: there has to be a way to validate a phone number (OTP verification). For our case, we assue the cell number has to be a 10 digit string.
+			// NOTE: there has to be a way to validate a phone number (OTP verification). For our case, we assume the cell number has to be a 10 digit string.
 			if (user.UserCellId.Length != 10)
 			{
 				return BadRequest("Phone number must be a 10-digit number");
@@ -54,7 +60,7 @@ namespace MessagingWebAPI.Controllers
 			user.LastSeenTime = DateTime.Now;
 			_repo.AddNewuser(user);
 			return CreatedAtRoute("GetIndividualUser", new
-				{ id = user.UserCellId }, user);
+				{ id = user.UserCellId }, user);	// It's good to return the object created as a response to header.
 		}
 
 		// PUT api/users/5
