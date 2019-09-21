@@ -24,21 +24,21 @@ namespace MessagingWebAPI.Controllers
 
 		// GET api/users
 		[HttpGet]
-		public ActionResult Get()
+		public IActionResult Get()
 		{
 			return NotFound();
 		}
 
 		// GET api/users/5
 		[HttpGet("{id}", Name = "GetIndividualUser")]
-		public ActionResult Get(string id)
+		public IActionResult Get(string id)
 		{
 			return Ok(_repo.GetUserFromCellNumber(id));
 		}
 
 		// POST api/users
 		[HttpPost]
-		public ActionResult Post([FromBody] CreateUserDTO userDTO)
+		public IActionResult Post([FromBody] CreateUserDTO userDTO)
 		{
 			if(userDTO == null)
 			{

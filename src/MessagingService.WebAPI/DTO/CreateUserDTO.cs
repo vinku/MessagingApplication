@@ -14,7 +14,7 @@ namespace MessagingService.WebAPI.DTO
 		public string Name { get; set; }
 
 		[Required(ErrorMessage = "Missing Cellnumber.")]
-		[StringLength(maximumLength: 10, MinimumLength = 10,ErrorMessage = "The length of phone number should be 10.")]
+		[StringLength(maximumLength: 10, MinimumLength = 10, ErrorMessage = "The length of phone number should be 10.")]
 		public string CellNumber { get; set; }
 
 		// TODO: automapper can do this.

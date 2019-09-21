@@ -9,6 +9,7 @@ namespace MessagingService.Domain
 		public Chat()
 		{
 			this.ChatMessages = new List<ChatMessage>();
+			this.UserChats = new List<UserChat>();
 		}
 
 		public Guid ChatId { get; set; }

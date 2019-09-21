@@ -26,13 +26,15 @@ namespace MessagingService.Data
 			return user;
 		}
 
-		public User GetUserFromCellNumberWithChats(string cellNumber)
+		public List<Guid> GetChatsForUser(string cellNumber)
 		{
-			var user =
-				_context.Users
-				.Include(u => u.UserChats)
-				.FirstOrDefault(u => u.UserCellId == cellNumber);
-			return user;
+			// Returns the chat-ids for particular cellNumber. Querying UserChats instead of Chats to avoid a join.
+			var chatIds =
+				_context.UserChats
+				.Where(uc => uc.UserCellId == cellNumber)
+				.Select(uc => uc.ChatId).ToList();
+
+			return chatIds;
 		}
 
 		public void AddNewuser(User user)
@@ -42,9 +44,28 @@ namespace MessagingService.Data
 			_context.SaveChanges();
 		}
 
+		public void AddChat(List<string> userIds, Chat chat)
+		{
+			_context.Chats.Add(chat);
+			foreach (string userId in userIds)
+			{
+				_context.UserChats.Add(
+					new UserChat { UserCellId = userId, ChatId = chat.ChatId });
+			}
+			_context.SaveChanges();
+		}
+
 		public bool UseridExists(string cellNumber)
 		{
 			return GetUserFromCellNumber(cellNumber) != null;
+		}
+
+		public Chat GetChats(Guid chatId)
+		{
+			var chat = _context.Chats
+				.Where(c => c.ChatId == chatId)
+				.FirstOrDefault();
+			return chat;
 		}
 	}
 }
