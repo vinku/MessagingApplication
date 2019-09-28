@@ -78,19 +78,23 @@ namespace MessagingService.WebAPI.Controllers
 
 			Chat chat = chatDTO.CreateChat();
 			_repo.AddChat(chatDTO.CellNumbers, chat);
-			return CreatedAtRoute("GetIndividualChat", new
-			{ userId = userId, chatId = chat.ChatId }, chat);
+
+			// Can't send the chat object directly because that would lead to recursive reference.
+			// See : https://stackoverflow.com/a/52615003. Hence using _repo.GetChats.
+			return CreatedAtRoute("GetIndividualChat",
+				new { userId, chatId = chat.ChatId.ToString() },
+				_repo.GetChats(chat.ChatId));
 		}
 
 		// PUT: api/Messages/5
-		[HttpPut("{id}")]
+		[HttpPut("{chatId}")]
 		public void Put(int id, [FromBody] string value)
 		{
 			throw new NotImplementedException();
 		}
 
 		// DELETE: api/ApiWithActions/5
-		[HttpDelete("{id}")]
+		[HttpDelete("{chatId}")]
 		public void Delete(int id)
 		{
 			throw new NotImplementedException();

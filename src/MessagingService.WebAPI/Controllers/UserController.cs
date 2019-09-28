@@ -59,9 +59,11 @@ namespace MessagingWebAPI.Controllers
 
 			// the creation time is the last seen time for now.
 			user.LastSeenTime = DateTime.Now;
+
 			_repo.AddNewuser(user);
-			return CreatedAtRoute("GetIndividualUser", new
-				{ id = user.UserCellId }, user);	// It's good to return the object created as a response to header.
+			return CreatedAtRoute("GetIndividualUser", 
+				new { id = user.UserCellId },
+				user);	// It's good to return the object created as a response to header.
 		}
 
 		// PUT api/users/5
