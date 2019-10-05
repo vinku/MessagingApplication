@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
 
 namespace MessagingService.Data
 {
@@ -28,10 +26,11 @@ namespace MessagingService.Data
 
 		public List<Guid> GetChatsForUser(string cellNumber)
 		{
-			// Returns the chat-ids for particular cellNumber. Querying UserChats instead of Chats to avoid a join.
+			// Returns the chat-ids for particular cellNumber.
 			var chatIds =
 				_context.UserChats
 				.Where(uc => uc.UserCellId == cellNumber)
+				.OrderByDescending(uc => uc.Chat.LastActivityTime)
 				.Select(uc => uc.ChatId).ToList();
 
 			return chatIds;
@@ -42,6 +41,15 @@ namespace MessagingService.Data
 			// ToDo : Remove this method and add a save method which would work for both update and creation of new resource.
 			_context.Users.Add(user);
 			_context.SaveChanges();
+		}
+
+		public bool ValidateChatForuser(string userId, Guid chatId)
+		{
+			UserChat UserChats =
+			_context.UserChats
+				.Where(uc => uc.UserCellId == userId && uc.ChatId == chatId)
+				.FirstOrDefault();
+			return UserChats != null;
 		}
 
 		public void AddChat(List<string> userIds, Chat chat)
@@ -55,17 +63,53 @@ namespace MessagingService.Data
 			_context.SaveChanges();
 		}
 
-		public bool UseridExists(string cellNumber)
+		public void RecordNewMessage(string userId, Guid chatId, Message message)
+		{
+			_context.Messages.Add(message);
+			_context.ChatMessages.Add(
+				new ChatMessage { ChatId = chatId, MessageId = message.MessageId });
+			_context.MessageSenders.Add(
+				new MessageSender { UserCellId = userId, MessageId = message.MessageId });
+			_context.SaveChanges();
+		}
+
+		public bool UserIdExists(string cellNumber)
 		{
 			return GetUserFromCellNumber(cellNumber) != null;
 		}
 
-		public Chat GetChats(Guid chatId)
+		public Chat GetChatFromId(Guid chatId)
 		{
-			var chat = _context.Chats
+			var chat =
+				_context.Chats
+				.Include(c => c.UserChats)
+				.ThenInclude(uc => uc.User)
 				.Where(c => c.ChatId == chatId)
 				.FirstOrDefault();
 			return chat;
+		}
+
+		public List<Message> GetMessagesForChat(Guid chatId)
+		{
+			var messages =
+				_context.Messages
+				.Include(m => m.ChatMessage)
+				.Where(m => m.ChatMessage.ChatId == chatId)
+				.Include(m => m.MessageSender)
+				.OrderByDescending(m => m.SentTime)
+				.ToList();
+			return messages;
+		}
+
+		public Message GetMessageFromId(Guid messageId)
+		{
+			var message =
+				_context.Messages
+				.Where(m => m.MessageId == messageId)
+				.Include(m => m.MessageSender)
+				.Include(m => m.ChatMessage)
+				.FirstOrDefault();
+			return message;
 		}
 	}
 }

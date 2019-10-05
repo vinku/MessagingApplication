@@ -14,7 +14,9 @@ namespace MessagingService.Data
 		public DbSet<User> Users { get; set; }
 		public DbSet<Chat> Chats { get; set; }
 		public DbSet<Message> Messages { get; set; }
-		public DbSet<UserChat> UserChats { get; set; }
+		public DbSet<UserChat> UserChats { get; set; }	// UserChat should have a LastReadMessageId, which would be helpful in blue-tick implementation.
+		public DbSet<ChatMessage> ChatMessages { get; set; }
+		public DbSet<MessageSender> MessageSenders { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MessagingService.Data;
+﻿using MessagingService.Data;
 using MessagingService.Domain;
 using MessagingService.WebAPI.DTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.Configuration.UserSecrets;
+using System;
 
 namespace MessagingService.WebAPI.Controllers
 {
@@ -27,7 +21,7 @@ namespace MessagingService.WebAPI.Controllers
 		[HttpGet]
 		public IActionResult Get(string userId)
 		{
-			if (!_repo.UseridExists(userId))
+			if (!_repo.UserIdExists(userId))
 			{
 				ModelState.AddModelError("Description", "cellNumber " + userId + " is not registered.");
 			}
@@ -44,7 +38,7 @@ namespace MessagingService.WebAPI.Controllers
 		[HttpGet("{chatId}", Name = "GetIndividualChat")]
 		public IActionResult Get(string userId, Guid chatId)
 		{
-			if (!_repo.UseridExists(userId))
+			if (!_repo.UserIdExists(userId))
 			{
 				ModelState.AddModelError("Description", "cellNumber " + userId + " is not registered.");
 			}
@@ -53,18 +47,17 @@ namespace MessagingService.WebAPI.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-
-			return Ok(_repo.GetChats(chatId));
+			return Ok(ChatDTO.ChatDTOFromChat(_repo.GetChatFromId(chatId)));
 		}
 
 		// POST: api/users/{userId}/chats/
 		[HttpPost]
-		public IActionResult Post(string userId, [FromBody] CreateChatDTO chatDTO )
+		public IActionResult Post(string userId, [FromBody] CreateChatDTO chatDTO)
 		{
 			chatDTO.CellNumbers.Add(userId);
 			foreach (string cellNumber in chatDTO.CellNumbers)
 			{
-				if(!_repo.UseridExists(cellNumber))
+				if (!_repo.UserIdExists(cellNumber))
 				{
 					ModelState.AddModelError("Description", "cellNumber " + cellNumber + " is not registered");
 					break;
@@ -83,7 +76,7 @@ namespace MessagingService.WebAPI.Controllers
 			// See : https://stackoverflow.com/a/52615003. Hence using _repo.GetChats.
 			return CreatedAtRoute("GetIndividualChat",
 				new { userId, chatId = chat.ChatId.ToString() },
-				_repo.GetChats(chat.ChatId));
+				ChatDTO.ChatDTOFromChat(_repo.GetChatFromId(chat.ChatId)));
 		}
 
 		// PUT: api/Messages/5
