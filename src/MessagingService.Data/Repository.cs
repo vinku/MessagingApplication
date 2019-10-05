@@ -66,10 +66,19 @@ namespace MessagingService.Data
 		public void RecordNewMessage(string userId, Guid chatId, Message message)
 		{
 			_context.Messages.Add(message);
+
+			// Update the last activity time for the corresponding chat.
+			Chat chatForMessage = _context.Chats
+				.Where(c => c.ChatId == chatId)
+				.FirstOrDefault();
+			chatForMessage.LastActivityTime = message.SentTime;
+			_context.Chats.Update(chatForMessage);
+
 			_context.ChatMessages.Add(
 				new ChatMessage { ChatId = chatId, MessageId = message.MessageId });
 			_context.MessageSenders.Add(
 				new MessageSender { UserCellId = userId, MessageId = message.MessageId });
+
 			_context.SaveChanges();
 		}
 

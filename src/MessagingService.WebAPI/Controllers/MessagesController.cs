@@ -54,7 +54,11 @@ namespace MessagingService.WebAPI.Controllers
 
 			Message message = newMessageDTO.GetMessageFromDTO();
 			_repo.RecordNewMessage(userId, chatId, message);
-			return Ok();
+			return CreatedAtRoute(
+				"IndividualMessage",
+				new { userId, chatId, messageId = message.MessageId.ToString()},
+				MessageDTO.GetMessageDTOFromMessage(_repo.GetMessageFromId(message.MessageId))
+				);
 		}
 
 		// PUT: api/Messages/5
